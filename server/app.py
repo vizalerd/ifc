@@ -357,4 +357,4 @@ def excelRoute():
 
 
 if __name__ == '__main__':
-    app.run(port=(os.getenv('PORT') if os.getenv('PORT') else 8000), debug=False)
+    app.run(host='0.0.0.0')
