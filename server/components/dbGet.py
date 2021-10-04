@@ -156,17 +156,22 @@ def getDB():
         # Текущая выработка
         result_today_2 = db.session.execute(sql_raw_today_2)
 
-        for row in result_today_2:            
+        today_prognozfakt = 0
+
+        for row in result_today_2:      
+
             
             if row['his_power'] is None:
                 s.today_prognozfakt_graph_his.append(0)                
             else:
                 s.today_prognozfakt_graph_his.append(row['his_power'])
+                today_prognozfakt = today_prognozfakt + row['his_power']
             
             if row['fc_power'] is None:
                 s.today_prognozfakt_graph_fc.append(0)                
             else:
                 s.today_prognozfakt_graph_fc.append(row['fc_power'])
+
             
             if row['dt'] is None:
                 s.today_prognozfakt_graph_dt.append(0)                
