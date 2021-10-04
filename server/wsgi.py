@@ -11,10 +11,14 @@ except IOError:
 
 sys.path.append(os.path.expanduser('~'))
 sys.path.append(os.path.expanduser('~') + '/ROOT/')
+sys.path.append(os.path.expanduser('~') + '/ROOT/server/')
 
 os.environ['FLASK_SETTINGS_MODULE'] = 'ROOT.settings'
+
+print(virtenv +' virt')
 
 from app import app as application
 
 if __name__ == "__main__":
     application.run()
+
