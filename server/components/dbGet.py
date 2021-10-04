@@ -52,12 +52,6 @@ def getDB():
         d_json_prognozfakt = json.dumps(prognozfakt)
         #END ----- Оправдываемость - значение
 
-        # Текущая выработка - значение
-        result_today = db.session.execute(sql_raw_today)
-        today_prognozfakt = result_today.first()[2]
-        d_json_prognozfakt_today = json.dumps(today_prognozfakt)
-        #END ------- Текущая выработка - значение
-
         # Метеоданные
         result_meteo_t = db.session.execute(sql_raw_meteo_t)
         for row in result_meteo_t:
@@ -184,7 +178,7 @@ def getDB():
         d_json_prognozfakt_graph_dt_today = json.dumps(s.today_prognozfakt_graph_dt, default = myconverter)
         
         d_json_prognozfakt_graph_fc_today = json.dumps(s.today_prognozfakt_graph_fc)
-        d_json_prognozfakt_graph_his_today = json.dumps(s.today_prognozfakt_graph_his)
+        d_json_prognozfakt_today = json.dumps(today_prognozfakt)        
         # END ----- Текущая выработка
 
 
