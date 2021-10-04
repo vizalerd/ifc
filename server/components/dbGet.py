@@ -36,7 +36,7 @@ def getDB():
 
         # SQL запросы
         sql_raw = 'select * from "forecast"."get_rep_power"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"')"
-        sql_raw_today = 'select * from "forecast"."get_rep_power"'+"('"+ s.g_date_yesterday + "','"+ s.g_date_today +"')"
+        # sql_raw_today = 'select * from "forecast"."get_rep_power"'+"('"+ s.g_date_yesterday + "','"+ s.g_date_today +"')"
         sql_raw_2 = 'select * from "forecast"."get_rep_power_graph"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"')"
         sql_raw_today_2 = 'select * from "forecast"."get_rep_power_graph"'+"('"+ s.g_date_yesterday + "','"+ s.g_date_today +"')"
         sql_raw_meteo_t = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"', 1)"
@@ -150,16 +150,11 @@ def getDB():
         # Текущая выработка
         result_today_2 = db.session.execute(sql_raw_today_2)
 
-        today_prognozfakt = 0
-
         for row in result_today_2:      
-
-            
             if row['his_power'] is None:
                 s.today_prognozfakt_graph_his.append(0)                
             else:
                 s.today_prognozfakt_graph_his.append(row['his_power'])
-                today_prognozfakt = today_prognozfakt + row['his_power']
             
             if row['fc_power'] is None:
                 s.today_prognozfakt_graph_fc.append(0)                
@@ -172,12 +167,15 @@ def getDB():
             else:
                 s.today_prognozfakt_graph_dt.append(row['dt'])
 
+        today_prognozfakt = sum(s.today_prognozfakt_graph_his)
+
         def myconverter(o):
             if isinstance(o, datetime.datetime):
                 return o.__str__()
         d_json_prognozfakt_graph_dt_today = json.dumps(s.today_prognozfakt_graph_dt, default = myconverter)
         
         d_json_prognozfakt_graph_fc_today = json.dumps(s.today_prognozfakt_graph_fc)
+        d_json_prognozfakt_graph_his_today = json.dumps(s.today_prognozfakt_graph_his)
         d_json_prognozfakt_today = json.dumps(today_prognozfakt)        
         # END ----- Текущая выработка
 
