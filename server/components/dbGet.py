@@ -22,7 +22,7 @@ def getDB():
         s.meteo_t_graph_fc.clear()
         s.meteo_c_graph_fc.clear()
         s.meteo_h_graph_fc.clear()
-        s.meteo_w_graph_fc.clear()
+        s.meteo_w_graph_fc.clear() 
         s.power_graph_his.clear()
         s.power_graph_fc.clear()
         s.income_graph_his.clear()

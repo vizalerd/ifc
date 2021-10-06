@@ -96,11 +96,11 @@ def getRoute():
 # POST route
 @app.route('/ping', methods=['POST'])
 def postRoute():
-    print('lol')
     try:
         vo = request.json
         r = date_range(vo)
-        print(r['date_start'])
+        print('start = ' + r['date_start'])
+        print('end = ' + r['date_end'])
         getDB()
         return {
             'date_start' : r['date_start'],
