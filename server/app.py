@@ -98,14 +98,35 @@ def getRoute():
 def postRoute():
     try:
         vo = request.json
-        r = date_range(vo)
-        print('start = ' + r['date_start'])
-        print('end = ' + r['date_end'])
-        getDB()
-        return {
-            'date_start' : r['date_start'],
-            'date_end' : r['date_end'],
-        } 
+        rd = date_range(vo)
+        print('start = ' + rd['date_start'])
+        print('end = ' + rd['date_end'])
+        r = getDB()
+        return jsonify({ 'prognozfakt': r['prognozfakt'], 
+                         'prognozfakt_graph_dt': r['prognozfakt_graph_dt'],
+                         'prognozfakt_graph_fc': r['prognozfakt_graph_fc'],
+                         'prognozfakt_graph_his': r['prognozfakt_graph_his'],
+                         'today_prognozfakt': r['today_prognozfakt'], 
+                         'today_prognozfakt_graph_dt': r['today_prognozfakt_graph_dt'],
+                         'today_prognozfakt_graph_fc': r['today_prognozfakt_graph_fc'],
+                         'today_prognozfakt_graph_his': r['today_prognozfakt_graph_his'],
+                         'meteo_t_graph_his' : r['meteo_t_graph_his'],
+                         'meteo_t_graph_fc' : r['meteo_t_graph_fc'],
+                         'meteo_c_graph_his' : r['meteo_c_graph_his'],
+                         'meteo_c_graph_fc' : r['meteo_c_graph_fc'],
+                         'meteo_h_graph_his' : r['meteo_h_graph_his'],
+                         'meteo_h_graph_fc' : r['meteo_h_graph_fc'],
+                         'meteo_w_graph_his' : r['meteo_w_graph_his'],
+                         'meteo_w_graph_fc' : r['meteo_w_graph_fc'],
+                         'power_graph_his' : r['power_graph_his'],
+                         'power_graph_fc' : r['power_graph_fc'],
+                         'income_graph_his' : r['income_graph_his'],
+                         'income_graph_fc' : r['income_graph_fc'],
+                         'co2_graph_his' : r['co2_graph_his'],
+                         'co2_graph_fc' : r['co2_graph_fc'],
+                         'kium_graph_his' : r['kium_graph_his'],
+                         'kium_graph_fc' : r['kium_graph_fc']
+                        }) 
 
     except Exception as e:
         # e holds description of the error
