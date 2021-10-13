@@ -1,4 +1,6 @@
+import sentry_sdk
 from flask import Flask, jsonify, session, redirect, url_for
+from sentry_sdk.integrations.flask import FlaskIntegration
 from flask.globals import request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -14,6 +16,16 @@ load_dotenv()
 
 # configuration
 DEBUG = True
+
+sentry_sdk.init(
+    "https://facfff1886de4dd994e6359693967a5c@o1037880.ingest.sentry.io/6006012",
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
 
 # instantiate the app
 app = Flask(__name__, static_folder='../dist/',    static_url_path='/')
@@ -39,6 +51,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 sess = Session(app)
+
 
 # Set up the index route
 @app.route('/')
