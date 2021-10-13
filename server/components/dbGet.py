@@ -6,267 +6,264 @@ import simplejson as json
 
 
 def getDB():
-    from app import db
+    from app import db, session
     try:
         
-        s.prognozfakt_graph_his.clear()
-        s.prognozfakt_graph_fc.clear()
-        s.prognozfakt_graph_dt.clear()
-        s.today_prognozfakt_graph_his.clear()
-        s.today_prognozfakt_graph_fc.clear()
-        s.today_prognozfakt_graph_dt.clear()
-        s.meteo_t_graph_his.clear()
-        s.meteo_c_graph_his.clear()
-        s.meteo_h_graph_his.clear()
-        s.meteo_w_graph_his.clear()
-        s.meteo_t_graph_fc.clear()
-        s.meteo_c_graph_fc.clear()
-        s.meteo_h_graph_fc.clear()
-        s.meteo_w_graph_fc.clear() 
-        s.power_graph_his.clear()
-        s.power_graph_fc.clear()
-        s.income_graph_his.clear()
-        s.income_graph_fc.clear()
-        s.co2_graph_his.clear()
-        s.co2_graph_fc.clear()
-        s.kium_graph_his.clear()
-        s.kium_graph_fc.clear()
-
-        print(s.g_date_start + ' !!!! ' + s.g_date_end)
+        his = []
+        fc = []
+        dt = []
+        _sum = 0
+        print(session['date_start'] + ' !!!! ' + session['date_end'])
 
         # SQL запросы
-        sql_raw = 'select * from "forecast"."get_rep_power"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"')"
+        session['sql_raw'] = 'select * from "forecast"."get_rep_power"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"')"
         # sql_raw_today = 'select * from "forecast"."get_rep_power"'+"('"+ s.g_date_yesterday + "','"+ s.g_date_today +"')"
-        sql_raw_2 = 'select * from "forecast"."get_rep_power_graph"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"')"
-        sql_raw_today_2 = 'select * from "forecast"."get_rep_power_graph"'+"('"+ s.g_date_yesterday + "','"+ s.g_date_today +"')"
-        sql_raw_meteo_t = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"', 1)"
-        sql_raw_meteo_c = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"', 2)"
-        sql_raw_meteo_h = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"', 3)"
-        sql_raw_meteo_w = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"', 4)"
-        sql_raw_group = 'select * from "forecast"."get_rep_kuim"'+"('"+ s.g_date_start + "','"+ s.g_date_end +"')"      
+        session['sql_raw_2'] = 'select * from "forecast"."get_rep_power_graph"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"')"
+        session['sql_raw_today_2'] = 'select * from "forecast"."get_rep_power_graph"'+"('"+ session['yesterday'] + "','"+ session['today'] +"')"
+        session['sql_raw_meteo_t'] = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"', 1)"
+        session['sql_raw_meteo_c'] = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"', 2)"
+        session['sql_raw_meteo_h'] = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"', 3)"
+        session['sql_raw_meteo_w'] = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"', 4)"
+        session['sql_raw_group'] = 'select * from "forecast"."get_rep_kuim"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"')"      
         #END --------- SQL запросы
 
         # Оправдываемость - значение  
-        result = db.session.execute(sql_raw)
-        prognozfakt = result.first()[2]
-        d_json_prognozfakt = json.dumps(prognozfakt)
+        session['result'] = db.session.execute(session['sql_raw'])
+        session['prognozfakt'] = json.dumps(session['result'].first()[2])
         #END ----- Оправдываемость - значение
 
         # Метеоданные
-        result_meteo_t = db.session.execute(sql_raw_meteo_t)
-        for row in result_meteo_t:
+        r = db.session.execute(session['sql_raw_meteo_t'])
+        his.clear()
+        fc.clear()
+        dt.clear()
+
+        for row in r:
             
             if row['his'] is None:
-                s.meteo_t_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.meteo_t_graph_his.append(row['his'])
+                his.append(row['his'])
             
             if row['fc'] is None:
-                s.meteo_t_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.meteo_t_graph_fc.append(row['fc'])
+                fc.append(row['fc'])
 
-        d_json_meteo_t_graph_his = json.dumps(s.meteo_t_graph_his)
-        d_json_meteo_t_graph_fc = json.dumps(s.meteo_t_graph_fc)
+        session['meteo_t_graph_his'] = json.dumps(his)
+        session['meteo_t_graph_fc'] = json.dumps(fc)
 
-        result_meteo_c = db.session.execute(sql_raw_meteo_c)
-        for row in result_meteo_c:
+        r = db.session.execute(session['sql_raw_meteo_c'])
+        his.clear()
+        fc.clear()
+        dt.clear()
+
+        for row in r:
             
             if row['his'] is None:
-                s.meteo_c_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.meteo_c_graph_his.append(row['his'])
+                his.append(row['his'])
             
             if row['fc'] is None:
-                s.meteo_c_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.meteo_c_graph_fc.append(row['fc'])
+                fc.append(row['fc'])
 
-        d_json_meteo_c_graph_his = json.dumps(s.meteo_c_graph_his)
-        d_json_meteo_c_graph_fc = json.dumps(s.meteo_c_graph_fc)
+        session['meteo_c_graph_his'] = json.dumps(his)
+        session['meteo_c_graph_fc'] = json.dumps(fc)
 
-        result_meteo_h = db.session.execute(sql_raw_meteo_h)
-        for row in result_meteo_h:
+        r = db.session.execute(session['sql_raw_meteo_h'])
+        his.clear()
+        fc.clear()
+        dt.clear()
+
+        for row in r:
             
             if row['his'] is None:
-                s.meteo_h_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.meteo_h_graph_his.append(row['his'])
+                his.append(row['his'])
             
             if row['fc'] is None:
-                s.meteo_h_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.meteo_h_graph_fc.append(row['fc'])
+                fc.append(row['fc'])
 
-        d_json_meteo_h_graph_his = json.dumps(s.meteo_h_graph_his)
-        d_json_meteo_h_graph_fc = json.dumps(s.meteo_h_graph_fc)
+        session['meteo_h_graph_his'] = json.dumps(his)
+        session['meteo_h_graph_fc'] = json.dumps(fc)
 
-        result_meteo_w = db.session.execute(sql_raw_meteo_w)
-        for row in result_meteo_w:
+        r = db.session.execute(session['sql_raw_meteo_w'])
+        his.clear()
+        fc.clear()
+        dt.clear()
+
+        for row in r:
             
             if row['his'] is None:
-                s.meteo_w_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.meteo_w_graph_his.append(row['his'])
+                his.append(row['his'])
             
             if row['fc'] is None:
-                s.meteo_w_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.meteo_w_graph_fc.append(row['fc'])
+                fc.append(row['fc'])
 
-        d_json_meteo_w_graph_his = json.dumps(s.meteo_w_graph_his)
-        d_json_meteo_w_graph_fc = json.dumps(s.meteo_w_graph_fc)
+        session['meteo_w_graph_his'] = json.dumps(his)
+        session['meteo_w_graph_fc'] = json.dumps(fc)
         # END -------- Метеоданные
 
         # Оправдываемость
-        result_2 = db.session.execute(sql_raw_2)
+        r = db.session.execute(session['sql_raw_2'])
+        his.clear()
+        fc.clear()
+        dt.clear()
 
-        for row in result_2:            
+        for row in r:            
             
             if row['his_power'] is None:
-                s.prognozfakt_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.prognozfakt_graph_his.append(row['his_power'])
+                his.append(row['his_power'])
             
             if row['fc_power'] is None:
-                s.prognozfakt_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.prognozfakt_graph_fc.append(row['fc_power'])
+                fc.append(row['fc_power'])
             
             if row['dt'] is None:
-                s.prognozfakt_graph_dt.append(0)                
+                dt.append(0)                
             else:
-                s.prognozfakt_graph_dt.append(row['dt'])
+                dt.append(row['dt'])
 
         def myconverter(o):
             if isinstance(o, datetime.datetime):
                 return o.__str__()
-        d_json_prognozfakt_graph_dt = json.dumps(s.prognozfakt_graph_dt, default = myconverter)
+        session['prognozfakt_graph_dt'] = json.dumps(dt, default = myconverter)
         
-        d_json_prognozfakt_graph_fc = json.dumps(s.prognozfakt_graph_fc)
-        d_json_prognozfakt_graph_his = json.dumps(s.prognozfakt_graph_his)
+        session['prognozfakt_graph_his'] = json.dumps(his)
+        session['prognozfakt_graph_fc'] = json.dumps(fc)
         # END ----- Оправдываемость
 
         # Текущая выработка
-        result_today_2 = db.session.execute(sql_raw_today_2)
+        r = db.session.execute(session['sql_raw_today_2'])
+        his.clear()
+        fc.clear()
+        dt.clear()
 
-        for row in result_today_2:      
+        for row in r:      
             if row['his_power'] is None:
-                s.today_prognozfakt_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.today_prognozfakt_graph_his.append(row['his_power'])
+                his.append(row['his_power'])
             
             if row['fc_power'] is None:
-                s.today_prognozfakt_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.today_prognozfakt_graph_fc.append(row['fc_power'])
+                fc.append(row['fc_power'])
 
             
             if row['dt'] is None:
-                s.today_prognozfakt_graph_dt.append(0)                
+                dt.append(0)                
             else:
-                s.today_prognozfakt_graph_dt.append(row['dt'])
+                dt.append(row['dt'])
 
-        today_prognozfakt = sum(s.today_prognozfakt_graph_his)
+        _sum = sum(his)
 
         def myconverter(o):
             if isinstance(o, datetime.datetime):
                 return o.__str__()
-        d_json_prognozfakt_graph_dt_today = json.dumps(s.today_prognozfakt_graph_dt, default = myconverter)
+        session['today_prognozfakt_graph_dt'] = json.dumps(dt, default = myconverter)
         
-        d_json_prognozfakt_graph_fc_today = json.dumps(s.today_prognozfakt_graph_fc)
-        d_json_prognozfakt_graph_his_today = json.dumps(s.today_prognozfakt_graph_his)
-        d_json_prognozfakt_today = json.dumps(today_prognozfakt)        
+        session['today_prognozfakt_graph_fc'] = json.dumps(fc)
+        session['today_prognozfakt_graph_his'] = json.dumps(his)
+        session['today_prognozfakt'] = json.dumps(_sum)        
         # END ----- Текущая выработка
 
 
         # Общая выработка, Доход, СО2, КУИМ
-        result_group = db.session.execute(sql_raw_group)
+        r = db.session.execute(session['sql_raw_group'])
+        his.clear()
+        fc.clear()
+        dt.clear()
 
-        for row in result_group:
+        for row in r:
             
             if row['his_power'] is None:
-                s.power_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.power_graph_his.append(row['his_power'])
-            
+                his.append(row['his_power'])
+
             if row['fc_power'] is None:
-                s.power_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.power_graph_fc.append(row['fc_power'])
+                fc.append(row['fc_power'])
+
+        session['power_graph_his'] = json.dumps(his)
+        session['power_graph_fc'] = json.dumps(fc)
+        his.clear()
+        fc.clear()
+
+        r = db.session.execute(session['sql_raw_group'])
+        for row in r:            
             
             if row['fc_income'] is None:
-                s.income_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.income_graph_fc.append(row['fc_income'])
+                fc.append(row['fc_income'])
             
             if row['his_income'] is None:
-                s.income_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.income_graph_his.append(row['his_income'])
+                his.append(row['his_income'])
             
+        session['income_graph_his'] = json.dumps(his)
+        session['income_graph_fc'] = json.dumps(fc)
+        his.clear()
+        fc.clear()
+        
+        r = db.session.execute(session['sql_raw_group'])
+        for row in r:            
+        
             if row['fc_co2'] is None:
-                s.co2_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.co2_graph_fc.append(row['fc_co2'])
+                fc.append(row['fc_co2'])
 
             if row['his_co2'] is None:
-                s.co2_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.co2_graph_his.append(row['his_co2'])
+                his.append(row['his_co2'])
 
+        session['co2_graph_his'] = json.dumps(his)
+        session['co2_graph_fc'] = json.dumps(fc)
+        his.clear()
+        fc.clear()
+
+        r = db.session.execute(session['sql_raw_group'])
+        for row in r:            
+        
             if row['his_kuim'] is None:
-                s.kium_graph_his.append(0)                
+                his.append(0)                
             else:
-                s.kium_graph_his.append(row['his_kuim'])
+                his.append(row['his_kuim'])
             
             if row['fc_kuim'] is None:
-                s.kium_graph_fc.append(0)                
+                fc.append(0)                
             else:
-                s.kium_graph_fc.append(row['fc_kuim'])
-                
-
-        d_json_power_graph_his = json.dumps(s.power_graph_his)
-        d_json_power_graph_fc = json.dumps(s.power_graph_fc)
-        d_json_income_graph_his = json.dumps(s.income_graph_his)
-        d_json_income_graph_fc = json.dumps(s.income_graph_fc)
-        d_json_co2_graph_his = json.dumps(s.co2_graph_his)
-        d_json_co2_graph_fc = json.dumps(s.co2_graph_fc)
-        d_json_kium_graph_his = json.dumps(s.kium_graph_his)
-        d_json_kium_graph_fc = json.dumps(s.kium_graph_fc)
+                fc.append(row['fc_kuim'])
+                 
+        session['kium_graph_his'] = json.dumps(his)
+        session['kium_graph_fc'] = json.dumps(fc)
+        his.clear()
+        fc.clear()
         # END ----- Общая выработка, Доход, СО2, КУИМ
 
 
-        
+        session["result"] = 'done'
+        return session["result"]
 
-
-        print ("getDB done : ")
-        
-        return {    'prognozfakt': d_json_prognozfakt, 
-                    'prognozfakt_graph_dt': d_json_prognozfakt_graph_dt,
-                    'prognozfakt_graph_fc': d_json_prognozfakt_graph_fc,
-                    'prognozfakt_graph_his': d_json_prognozfakt_graph_his,
-                    'today_prognozfakt': d_json_prognozfakt_today, 
-                    'today_prognozfakt_graph_dt': d_json_prognozfakt_graph_dt_today,
-                    'today_prognozfakt_graph_fc': d_json_prognozfakt_graph_fc_today,
-                    'today_prognozfakt_graph_his': d_json_prognozfakt_graph_his_today,
-                    'meteo_t_graph_his' : d_json_meteo_t_graph_his,
-                    'meteo_t_graph_fc' : d_json_meteo_t_graph_fc,
-                    'meteo_c_graph_his' : d_json_meteo_c_graph_his,
-                    'meteo_c_graph_fc' : d_json_meteo_c_graph_fc,
-                    'meteo_h_graph_his' : d_json_meteo_h_graph_his,
-                    'meteo_h_graph_fc' : d_json_meteo_h_graph_fc,
-                    'meteo_w_graph_his' : d_json_meteo_w_graph_his,
-                    'meteo_w_graph_fc' : d_json_meteo_w_graph_fc,
-                    'power_graph_his' : d_json_power_graph_his,
-                    'power_graph_fc' : d_json_power_graph_fc,
-                    'income_graph_his' : d_json_income_graph_his,
-                    'income_graph_fc' : d_json_income_graph_fc,
-                    'co2_graph_his' : d_json_co2_graph_his,
-                    'co2_graph_fc' : d_json_co2_graph_fc,
-                    'kium_graph_his' : d_json_kium_graph_his,
-                    'kium_graph_fc' : d_json_kium_graph_fc
-                }
     except Exception as e:
         # e holds description of the error
         error_text = "<p>The error:<br>" + str(e) + "</p>"

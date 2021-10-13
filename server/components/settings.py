@@ -53,12 +53,4 @@ kium_graph_his = []
 kium_graph_fc = []
 
 
-now = datetime.date.today()
-today = now - datetime.timedelta(days=1) 
-yesterday = today - datetime.timedelta(days=1) 
 
-g_date_start = yesterday.strftime("%Y-%m-%d")
-g_date_end = today.strftime("%Y-%m-%d")
-
-g_date_yesterday = yesterday.strftime("%Y-%m-%d")
-g_date_today = today.strftime("%Y-%m-%d")
