@@ -1,6 +1,5 @@
 ## getting data from db
 
-from components import settings as s
 import datetime
 import simplejson as json
 
@@ -8,7 +7,8 @@ import simplejson as json
 def getDB():
     from app import db, session
     try:
-        
+        print('hehe ' + session.sid)
+                
         his = []
         fc = []
         dt = []

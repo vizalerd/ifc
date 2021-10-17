@@ -94,10 +94,8 @@ from components.dateRange import date_range
 def getRoute():
     try:
         getDB()
-
-        prognozfakt = session['prognozfakt']
-        session.modified = True
-        return jsonify({ 'prognozfakt': prognozfakt, 
+        print(session['prognozfakt'])
+        return jsonify({ 'prognozfakt': session['prognozfakt'], 
                          'prognozfakt_graph_dt': session['prognozfakt_graph_dt'],
                          'prognozfakt_graph_fc': session['prognozfakt_graph_fc'],
                          'prognozfakt_graph_his': session['prognozfakt_graph_his'],
