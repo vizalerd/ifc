@@ -25,6 +25,7 @@ def getDB():
         session['sql_raw_meteo_h'] = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"', 3)"
         session['sql_raw_meteo_w'] = 'select * from "forecast"."get_rep_meteo_graph"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"', 4)"
         session['sql_raw_group'] = 'select * from "forecast"."get_rep_kuim"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"')"      
+         
         #END --------- SQL запросы
 
         # Оправдываемость - значение  
@@ -259,7 +260,6 @@ def getDB():
         his.clear()
         fc.clear()
         # END ----- Общая выработка, Доход, СО2, КУИМ
-
 
         session["result"] = 'done'
         return session["result"]

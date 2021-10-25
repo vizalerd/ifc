@@ -2,15 +2,17 @@ import sentry_sdk
 from flask import Flask, jsonify, session, redirect, url_for
 from sentry_sdk.integrations.flask import FlaskIntegration
 from flask.globals import request
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 import simplejson as json
 from dotenv import load_dotenv
 from decimal import Decimal
-from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, ForeignKey
+from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, ForeignKey, exc
 import datetime
 from flask_session import Session
+import requests
+
 
 load_dotenv()
 
@@ -53,8 +55,12 @@ db = SQLAlchemy(app)
 sess = Session(app)
 
 
+
+from components.currentMeteo import currentMeteo
+
 # Set up the index route
 @app.route('/')
+@cross_origin(supports_credentials=True)
 def index():
     now = datetime.date.today()
     today = now - datetime.timedelta(days=1) 
@@ -86,11 +92,14 @@ from components.dbGet import getDB
 
 from components.dateRange import date_range
 
+from components.getReports import getReports
+
 
 
 
 # GET route
 @app.route('/ping', methods=['GET'])
+@cross_origin(supports_credentials=True)
 def getRoute():
     try:
         getDB()
@@ -128,6 +137,7 @@ def getRoute():
 
 # POST route
 @app.route('/ping', methods=['POST'])
+@cross_origin(supports_credentials=True)
 def postRoute():
     try:
         vo = request.json
@@ -174,6 +184,7 @@ from components.excelGenerate import excelGenerate
 
 # EXCEL report
 @app.route('/excel', methods=['GET'])
+@cross_origin(supports_credentials=True)
 def excelRoute():
     try:   
         excelGenerate()        
@@ -186,10 +197,39 @@ def excelRoute():
         return hed + error_text
 
 @app.route("/drop")
+@cross_origin(supports_credentials=True)
 def logout():
     session.clear
     return redirect(url_for("index"))
 
+@app.route("/getReports", methods=['GET'])
+@cross_origin(supports_credentials=True)
+def profile():
+    getReports()
+    return jsonify({ 'report_id' : session['report_id'],
+                     'report_date' : session['report_date'],
+                     'report_target' : session['report_target'],
+    })
+
+@app.route("/postReports", methods=['POST'])
+@cross_origin(supports_credentials=True)
+def profile_post():
+    vo = request.json
+    getReports()
+    return jsonify({ 'report_id' : session['report_id'],
+                     'report_date' : session['report_date'],
+                     'report_target' : session['report_target'],
+    })
+
+@app.route('/currentMeteoInfo', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def currentMet():
+    currentMeteo()
+    return jsonify({ 'currentTemp' : session['currentTemp'],
+                     'currentClouds' : session['currentClouds'],
+                     'currentWind' : session['currentWind'],
+                     'currentIrradiation' : session['currentIrradiation'],
+    })
 
 if __name__ == '__main__':
     app.run()
