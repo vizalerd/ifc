@@ -63,14 +63,20 @@ from components.currentMeteo import currentMeteo
 @cross_origin(supports_credentials=True)
 def index():
     now = datetime.date.today()
-    today = now - datetime.timedelta(days=1) 
+    today = now 
     yesterday = today - datetime.timedelta(days=1) 
+
+    print('now')
+    print(today)
 
     session['date_start'] = yesterday.strftime("%Y-%m-%d")
     session['date_end'] = today.strftime("%Y-%m-%d")
 
     session['yesterday'] = yesterday.strftime("%Y-%m-%d")
     session['today'] = today.strftime("%Y-%m-%d")
+
+    print(session['today'])
+
 
     print(session.sid)
     return app.send_static_file('index.html')
