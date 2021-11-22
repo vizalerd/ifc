@@ -1,5 +1,5 @@
 import sentry_sdk
-from flask import Flask, jsonify, session, redirect, url_for
+from flask import Flask, jsonify, session, redirect, url_for, flash, send_from_directory
 from sentry_sdk.integrations.flask import FlaskIntegration
 from flask.globals import request
 from flask_cors import CORS, cross_origin
@@ -12,6 +12,7 @@ from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, 
 import datetime
 from flask_session import Session
 import requests
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 load_dotenv()
@@ -79,6 +80,8 @@ def index():
 
 
     print(session.sid)
+    
+    
     return app.send_static_file('index.html')
 
 # enable CORS
@@ -101,6 +104,64 @@ from components.dateRange import date_range
 from components.getReports import getReports
 
 
+@app.route('/dashboard')
+@cross_origin(supports_credentials=True)
+def dashboard():
+    return redirect('/#/dashboard')
+
+@app.route('/login', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def login():
+    lol = 'lol'
+    vo = request.json
+    print('login')
+    print(vo)
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST':
+        username = vo['username']
+        password = vo['password']
+        print(password)
+ 
+        # Check if account exists using MySQL
+        session['sql_raw_login'] = 'select * from forecast.users WHERE users.login = '+"'"+ username + "'"
+        
+        # Fetch one record and return result
+        accounts = db.session.execute(session['sql_raw_login'])
+ 
+        for account in accounts:
+            password_rs = account['passw']
+            print('ebat')
+            print(password_rs)
+            # If account exists in users table in out database
+            # if check_password_hash(password_rs, password):
+            if (password == password_rs):
+                print('EQUAL')
+                # Create session data, we can access this data in other routes
+                session['loggedin'] = True
+                session['id'] = account['id']
+                session['username'] = account['login']
+                # Redirect to home page
+                r = "True"
+                return jsonify({ 'isOK': json.dumps(r) })
+            else:
+                print("NOT EQUAL")
+                # Account doesnt exist or username/password incorrect
+                flash('Incorrect username/password')
+                r = "False"
+                return jsonify({ 'isOK': json.dumps(r) })
+        else:
+            # Account doesnt exist or username/password incorrect
+            flash('Incorrect username/password')
+ 
+    return redirect(url_for('index'))
+
+@app.route('/isok', methods=['GET'])
+def isOK():
+    if 'loggedin' in session:
+        return jsonify({ 'isOK': session['loggedin'] })
+    else: 
+        r = "false"
+        return jsonify({ 'isOK': r })
 
 
 # GET route
@@ -108,6 +169,8 @@ from components.getReports import getReports
 @cross_origin(supports_credentials=True)
 def getRoute():
     try:
+        print("ping current session")
+        print(session.sid)
         getDB()
         print(session['prognozfakt'])
         return jsonify({ 'prognozfakt': session['prognozfakt'], 
@@ -193,8 +256,8 @@ from components.excelGenerate import excelGenerate
 @cross_origin(supports_credentials=True)
 def excelRoute():
     try:   
-        excelGenerate()        
-        return 'success'
+        r = excelGenerate()        
+        return r
 
     except Exception as e:
         # e holds description of the error

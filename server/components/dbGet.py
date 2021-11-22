@@ -13,7 +13,7 @@ def getDB():
         fc = []
         dt = []
         _sum = 0
-        print(session['today'] + ' !!!! ' + session['yesterday'])
+        print(session['today'] + ' !!!! ' + session['yesterday '])
 
         # SQL запросы
         session['sql_raw'] = 'select * from "forecast"."get_rep_power"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"')"

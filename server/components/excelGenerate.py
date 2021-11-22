@@ -54,9 +54,7 @@ def excelGenerate():
             worksheet.write(row, 2, '=SUM(C2:C5)')
 
         
-        return send_from_directory(directory=('app/reports/'), 
-                                    filename=report_name, 
-                                    as_attachment=True)
+        return report_name
 
     except Exception as e:
         # e holds description of the error
