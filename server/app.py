@@ -256,8 +256,8 @@ from components.excelGenerate import excelGenerate
 @cross_origin(supports_credentials=True)
 def excelRoute():
     try:   
-        r = excelGenerate()        
-        return r
+        excelGenerate()        
+        return 'success'
 
     except Exception as e:
         # e holds description of the error
