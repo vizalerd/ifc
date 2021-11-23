@@ -1,5 +1,6 @@
 import sentry_sdk
 from flask import Flask, jsonify, session, redirect, url_for, flash, send_from_directory
+import os
 from sentry_sdk.integrations.flask import FlaskIntegration
 from flask.globals import request
 from flask_cors import CORS, cross_origin
@@ -37,6 +38,9 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = "CtrhtnysqRk.x_2021"
 app.config['SESSION_TYPE'] = 'filesystem'
 
+
+app.config["REPORTS"] = os.path.dirname(app.instance_path) + "\_reports"
+
 # db connection
 username = 'r_forecast'
 password = 'Q1w2e3r$'
@@ -59,6 +63,9 @@ sess = Session(app)
 
 from components.currentMeteo import currentMeteo
 
+# enable CORS
+CORS(app, resources={r'/*': {'origins': '*'}})
+
 # Set up the index route
 @app.route('/')
 @cross_origin(supports_credentials=True)
@@ -76,7 +83,9 @@ def index():
     session['yesterday'] = yesterday.strftime("%Y-%m-%d")
     session['today'] = today.strftime("%Y-%m-%d")
 
+    print('session[today]')
     print(session['today'])
+    print('---------------------------------------')
 
 
     print(session.sid)
@@ -84,8 +93,7 @@ def index():
     
     return app.send_static_file('index.html')
 
-# enable CORS
-CORS(app, resources={r'/*': {'origins': '*'}})
+
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -102,6 +110,7 @@ from components.dbGet import getDB
 from components.dateRange import date_range
 
 from components.getReports import getReports
+from components.postReports import postReports
 
 
 @app.route('/dashboard')
@@ -255,9 +264,14 @@ from components.excelGenerate import excelGenerate
 @app.route('/excel', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def excelRoute():
-    try:   
-        r = excelGenerate()        
-        return r
+    try: 
+        print("report_name")
+
+        session['report_name'] = "_" + excelGenerate()     
+        print(session['report_name'])   
+        return send_from_directory(app.config["REPORTS"], 
+                                    filename=session['report_name'], 
+                                    as_attachment=True)
 
     except Exception as e:
         # e holds description of the error
@@ -271,7 +285,7 @@ def logout():
     session.clear
     return redirect(url_for("index"))
 
-@app.route("/getReports", methods=['GET'])
+@app.route("/getreports", methods=['GET'])
 @cross_origin(supports_credentials=True)
 def profile():
     getReports()
@@ -280,15 +294,12 @@ def profile():
                      'report_target' : session['report_target'],
     })
 
-@app.route("/postReports", methods=['POST'])
+@app.route("/postreports", methods=['POST'])
 @cross_origin(supports_credentials=True)
 def profile_post():
     vo = request.json
-    getReports()
-    return jsonify({ 'report_id' : session['report_id'],
-                     'report_date' : session['report_date'],
-                     'report_target' : session['report_target'],
-    })
+    postReports(vo)
+    return 'success'
 
 @app.route('/currentMeteoInfo', methods=['GET'])
 @cross_origin(supports_credentials=True)

@@ -4,6 +4,8 @@ from flask import send_from_directory
 import os
 import random
 import string
+import simplejson as json
+
 
 def get_random_string(length):
     # choose from all lowercase letter
@@ -17,13 +19,17 @@ def excelGenerate():
     try:
    
         now = datetime.datetime.now()
-        report_name = os.path.dirname(app.instance_path) + '\_reports\iForecast-Отчет-' + now.strftime("%Y-%m-%d") + ' #' + get_random_string(8) + '.xlsx'
-        with xlsxwriter.Workbook(report_name) as workbook:
+        session['report_name'] = 'iForecast-Отчет-' + now.strftime("%Y-%m-%d") + '#' + get_random_string(8) + '.xlsx'
+        print("function report name")
+        print(session['report_name'])
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        full_report_name = os.path.dirname(app.instance_path) + "\_reports\_" + session['report_name']
+        with xlsxwriter.Workbook(full_report_name) as workbook:
             worksheet = workbook.add_worksheet()
-            print(report_name)
+            print(session['report_name'])
 
             bold = workbook.add_format({'bold': 1})
-            date_format = workbook.add_format({'num_format': 'm/d/yyyy h:mm'})
+            date_format = workbook.add_format({'num_format': 'm/d/yyyy h:mm:ss'})
             worksheet.set_column(0, 3, 30)
 
             worksheet.write('A1', 'Время', bold)
@@ -31,30 +37,36 @@ def excelGenerate():
             worksheet.write('C1', 'Факт', bold)
 
 
-            row = 1
-            col = 0
-            for date in (session['prognozfakt_graph_dt']):
-                worksheet.write_datetime(row, col, date, date_format )
-                row += 1
+            
             
             row = 1
             col = 1
-            for fc in (session['prognozfakt_graph_fc']):
+            excel_data = json.loads(session['prognozfakt_graph_fc'])
+            for fc in (excel_data):
                 worksheet.write(row, col, fc)
                 row += 1
 
             row = 1
             col = 2
-            for his in (session['prognozfakt_graph_his']):
+            excel_data = json.loads(session['prognozfakt_graph_his'])
+            for his in (excel_data):
                 worksheet.write(row, col, his)
+                row += 1
+
+            row = 1
+            col = 0
+            excel_data = json.loads(session['prognozfakt_graph_dt'])
+            for date in (excel_data):
+                date_time = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+                worksheet.write_datetime(row, col, date_time, date_format )
                 row += 1
 
             # Write a total using a formula.
             worksheet.write(row, 0, 'Прогноз/Факт', bold)
-            worksheet.write(row, 2, '=SUM(C2:C5)')
+            worksheet.write(row, 2, session['prognozfakt'])
 
         
-        return report_name
+        return session['report_name']
 
     except Exception as e:
         # e holds description of the error

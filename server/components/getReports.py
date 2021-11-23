@@ -11,14 +11,12 @@ def getReports():
         _target = []
 
         # SQL запросы
-        session['sql_raw_reports'] = 'select * from forecast.forecast_report_dates'     
+        session['sql_raw_reports'] = "select * from forecast.forecast_report_dates where forecast_date > date('" + session['today'] + "') "     
        
         #END --------- SQL запросы
 
         # 
 
-        
-        
         r = db.session.execute(session['sql_raw_reports'])
         for row in r:
             

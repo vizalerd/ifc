@@ -13,7 +13,29 @@ def getDB():
         fc = []
         dt = []
         _sum = 0
-        print(session['today'] + ' !!!! ' + session['yesterday '])
+
+        if "today" in session:
+            print(session['today'])
+            print("DBGET DATE --------------------------")
+        else: 
+            print('!!!!!!!!There was no session today var')
+            now = datetime.date.today()
+            today = now 
+            yesterday = today - datetime.timedelta(days=1) 
+
+            print('now')
+            print(today)
+
+            session['date_start'] = yesterday.strftime("%Y-%m-%d")
+            session['date_end'] = today.strftime("%Y-%m-%d")
+
+            session['yesterday'] = yesterday.strftime("%Y-%m-%d")
+            session['today'] = today.strftime("%Y-%m-%d")
+
+            print('session[today]')
+            print(session['today'])
+            print('---------------------------------------') 
+
 
         # SQL запросы
         session['sql_raw'] = 'select * from "forecast"."get_rep_power"'+"('"+ session['date_start'] + "','"+ session['date_end'] +"')"
