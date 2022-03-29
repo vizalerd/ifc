@@ -1,6 +1,8 @@
 import sentry_sdk
 from flask import Flask, jsonify, session, redirect, url_for, flash, send_from_directory
 import os
+from os import environ
+import redis
 from sentry_sdk.integrations.flask import FlaskIntegration
 from flask.globals import request
 from flask_cors import CORS, cross_origin
@@ -37,6 +39,8 @@ app.config.from_object(__name__)
 
 app.config['SECRET_KEY'] = "CtrhtnysqRk.x_2021"
 app.config['SESSION_TYPE'] = 'filesystem'
+
+# app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
 
 
 app.config["REPORTS"] = os.path.dirname(app.instance_path) + "\_reports"
