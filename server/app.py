@@ -2,7 +2,7 @@ import sentry_sdk
 from flask import Flask, jsonify, session, redirect, url_for, flash, send_from_directory
 import os
 from os import environ
-import redis
+
 from sentry_sdk.integrations.flask import FlaskIntegration
 from flask.globals import request
 from flask_cors import CORS, cross_origin

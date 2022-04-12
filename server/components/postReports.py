@@ -19,6 +19,7 @@ def postReports(vo):
         
         
         r = db.session.execute(session['sql_raw_reports_post'])
+        db.session.commit()
         
         return 'success'
 

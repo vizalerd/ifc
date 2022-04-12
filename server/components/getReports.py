@@ -24,11 +24,13 @@ def getReports():
                 _id.append(0)   
             else:
                 _id.append(row['id'])  
+                print(row['id'])
 
             if row['report_date'] is None:
                 _date.append(0)   
             else:
                 _date.append(row['report_date'].strftime(" %Y-%m-%d "))
+                
 
             if row['forecast_date'] is None:
                 _target.append(0)             
