@@ -5,9 +5,10 @@ import simplejson as json
 
 
 def getDB():
-    from app import db, session
+    from app import db, session, time, connection
     try:
         print('hehe ' + session.sid)
+        start_time_getDB = time.time()
                 
         his = []
         fc = []
@@ -51,114 +52,143 @@ def getDB():
         #END --------- SQL запросы
 
         # Оправдываемость - значение  
-        session['result'] = db.session.execute(session['sql_raw'])
-        session['prognozfakt'] = json.dumps(session['result'].first()[2])
+        cursor = connection.cursor()
+        cursor.execute(session['sql_raw'])
+        session['result'] = cursor.fetchall()
+        print("WWS")
+        print(session['result'][0][2])
+        session['prognozfakt'] = json.dumps(session['result'][0][2])
+        print("DBGET EXECUTE TIME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("--- %s seconds ---" % (time.time() - start_time_getDB))
+        
+        # session['result'] = db.session.execute(session['sql_raw'])
+        # print("WWS")
+        # print(session['result'])
+        # print("DBGET EXECUTE TIME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        # print("--- %s seconds ---" % (time.time() - start_time_getDB))
+        # session['prognozfakt'] = json.dumps(session['result'].first()[2])
+        # print("DBGET DUMP TIME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        # print("--- %s seconds ---" % (time.time() - start_time_getDB))
+        
         #END ----- Оправдываемость - значение
 
         # Метеоданные
-        r = db.session.execute(session['sql_raw_meteo_t'])
+
+        # r = db.session.execute(session['sql_raw_meteo_t'])
+        cursor.execute(session['sql_raw_meteo_t'])
+        r = cursor.fetchall()
         his.clear()
         fc.clear()
         dt.clear()
 
         for row in r:
             
-            if row['his'] is None:
+            if row[1] is None:
                 his.append(0)                
             else:
-                his.append(row['his'])
+                his.append(row[1])
             
-            if row['fc'] is None:
+            if row[2] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc'])
+                fc.append(row[2])
 
         session['meteo_t_graph_his'] = json.dumps(his)
         session['meteo_t_graph_fc'] = json.dumps(fc)
+        print("DBGET DUMP LOOP TIME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("--- %s seconds ---" % (time.time() - start_time_getDB))
 
-        r = db.session.execute(session['sql_raw_meteo_c'])
+        # r = db.session.execute(session['sql_raw_meteo_c'])
+        cursor.execute(session['sql_raw_meteo_c'])
+        r = cursor.fetchall()
         his.clear()
         fc.clear()
         dt.clear()
 
         for row in r:
             
-            if row['his'] is None:
+            if row[1] is None:
                 his.append(0)                
             else:
-                his.append(row['his'])
+                his.append(row[1])
             
-            if row['fc'] is None:
+            if row[2] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc'])
+                fc.append(row[2])
 
         session['meteo_c_graph_his'] = json.dumps(his)
         session['meteo_c_graph_fc'] = json.dumps(fc)
 
-        r = db.session.execute(session['sql_raw_meteo_h'])
+        # r = db.session.execute(session['sql_raw_meteo_h'])
+        cursor.execute(session['sql_raw_meteo_t'])
+        r = cursor.fetchall()
         his.clear()
         fc.clear()
         dt.clear()
 
         for row in r:
             
-            if row['his'] is None:
+            if row[1] is None:
                 his.append(0)                
             else:
-                his.append(row['his'])
+                his.append(row[1])
             
-            if row['fc'] is None:
+            if row[2] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc'])
+                fc.append(row[2])
 
         session['meteo_h_graph_his'] = json.dumps(his)
         session['meteo_h_graph_fc'] = json.dumps(fc)
 
-        r = db.session.execute(session['sql_raw_meteo_w'])
+        # r = db.session.execute(session['sql_raw_meteo_w'])
+        cursor.execute(session['sql_raw_meteo_w'])
+        r = cursor.fetchall()
         his.clear()
         fc.clear()
         dt.clear()
 
         for row in r:
             
-            if row['his'] is None:
+            if row[1] is None:
                 his.append(0)                
             else:
-                his.append(row['his'])
+                his.append(row[1])
             
-            if row['fc'] is None:
+            if row[2] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc'])
+                fc.append(row[2])
 
         session['meteo_w_graph_his'] = json.dumps(his)
         session['meteo_w_graph_fc'] = json.dumps(fc)
         # END -------- Метеоданные
 
         # Оправдываемость
-        r = db.session.execute(session['sql_raw_2'])
+        # r = db.session.execute(session['sql_raw_2'])
+        cursor.execute(session['sql_raw_2'])
+        r = cursor.fetchall()
         his.clear()
         fc.clear()
         dt.clear()
 
         for row in r:            
             
-            if row['his_power'] is None:
+            if row[1] is None:
                 his.append(0)                
             else:
-                his.append(row['his_power'])
+                his.append(row[1])
             
-            if row['fc_power'] is None:
+            if row[2] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc_power'])
+                fc.append(row[2])
             
-            if row['dt'] is None:
+            if row[0] is None:
                 dt.append(0)                
             else:
-                dt.append(row['dt'])
+                dt.append(row[0])
 
         def myconverter(o):
             if isinstance(o, datetime.datetime):
@@ -167,30 +197,33 @@ def getDB():
         
         session['prognozfakt_graph_his'] = json.dumps(his)
         session['prognozfakt_graph_fc'] = json.dumps(fc)
+        print("MOTHERFUCKER")
         # END ----- Оправдываемость
 
         # Текущая выработка
-        r = db.session.execute(session['sql_raw_today_2'])
+        # r = db.session.execute(session['sql_raw_today_2'])
+        cursor.execute(session['sql_raw_today_2'])
+        r = cursor.fetchall()
         his.clear()
         fc.clear()
         dt.clear()
 
         for row in r:      
-            if row['his_power'] is None:
+            if row[1] is None:
                 his.append(0)                
             else:
-                his.append(row['his_power'])
+                his.append(row[1])
             
-            if row['fc_power'] is None:
+            if row[2] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc_power'])
+                fc.append(row[2])
 
             
-            if row['dt'] is None:
+            if row[0] is None:
                 dt.append(0)                
             else:
-                dt.append(row['dt'])
+                dt.append(row[0])
 
         _sum = sum(his)
 
@@ -206,76 +239,79 @@ def getDB():
 
 
         # Общая выработка, Доход, СО2, КУИМ
-        r = db.session.execute(session['sql_raw_group'])
+        # r = db.session.execute(session['sql_raw_group'])
+        cursor.execute(session['sql_raw_group'])
+        r = cursor.fetchall()
+        print(r)
         his.clear()
         fc.clear()
         dt.clear()
 
         for row in r:
             
-            if row['his_power'] is None:
+            if row[1] is None:
                 his.append(0)                
             else:
-                his.append(row['his_power'])
+                his.append(row[1])
 
-            if row['fc_power'] is None:
+            if row[2] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc_power'])
+                fc.append(row[2])
 
         session['power_graph_his'] = json.dumps(his)
         session['power_graph_fc'] = json.dumps(fc)
         his.clear()
         fc.clear()
 
-        r = db.session.execute(session['sql_raw_group'])
+        # r = db.session.execute(session['sql_raw_group'])
         for row in r:            
             
-            if row['fc_income'] is None:
+            if row[6] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc_income'])
+                fc.append(row[6])
             
-            if row['his_income'] is None:
+            if row[7] is None:
                 his.append(0)                
             else:
-                his.append(row['his_income'])
+                his.append(row[7])
             
         session['income_graph_his'] = json.dumps(his)
         session['income_graph_fc'] = json.dumps(fc)
         his.clear()
         fc.clear()
         
-        r = db.session.execute(session['sql_raw_group'])
+        # r = db.session.execute(session['sql_raw_group'])
         for row in r:            
         
-            if row['fc_co2'] is None:
+            if row[8] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc_co2'])
+                fc.append(row[8])
 
-            if row['his_co2'] is None:
+            if row[9] is None:
                 his.append(0)                
             else:
-                his.append(row['his_co2'])
+                his.append(row[9])
 
         session['co2_graph_his'] = json.dumps(his)
         session['co2_graph_fc'] = json.dumps(fc)
         his.clear()
         fc.clear()
 
-        r = db.session.execute(session['sql_raw_group'])
+        # r = db.session.execute(session['sql_raw_group'])
         for row in r:            
         
-            if row['his_kuim'] is None:
+            if row[4] is None:
                 his.append(0)                
             else:
-                his.append(row['his_kuim'])
+                his.append(row[4])
             
-            if row['fc_kuim'] is None:
+            if row[5] is None:
                 fc.append(0)                
             else:
-                fc.append(row['fc_kuim'])
+                fc.append(row[5])
                  
         session['kium_graph_his'] = json.dumps(his)
         session['kium_graph_fc'] = json.dumps(fc)

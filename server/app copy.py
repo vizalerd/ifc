@@ -3,7 +3,6 @@ from flask import Flask, jsonify, session, redirect, url_for, flash, send_from_d
 import os
 from os import environ
 import time
-import psycopg2
 
 from sentry_sdk.integrations.flask import FlaskIntegration
 from flask.globals import request
@@ -53,14 +52,6 @@ password = 'Q1w2e3r$'
 userpass = 'postgresql+psycopg2://' + username + ':' + password + '@'
 server  = '95.56.236.114:55432'
 dbname   = '/db_forecast'
-dbname2   = 'db_forecast'
-host = '95.56.236.114'
-port = '55432'
-
-
-connection = psycopg2.connect(user=username, password=password, host=host, port=port, database=dbname2)
-connection.autocommit = True
-
 
 
 # put them all together as a string that shows SQLAlchemy where the database is
@@ -238,8 +229,8 @@ def postRoute():
         rd = date_range(vo)
         # print('start = ' + rd['date_start'])
         # print('end = ' + rd['date_end'])
-        session['date_start'] = rd['date_start']
-        session['date_end'] = rd['date_end']
+        # session['date_start'] = rd['date_start']
+        # session['date_end'] = rd['date_end']
         # getDB()
         return jsonify({ 'prognozfakt': session['prognozfakt'], 
                          'prognozfakt_graph_dt': session['prognozfakt_graph_dt'],
